@@ -1,1 +1,4 @@
-# yasashiikakumeilab
+# Twitcasting-Discord-Commenter
+
+Discordの特定チャンネルからツイキャスにコメントできるコードです。
+詳細とかはめんどくさいので書きません。requireとかで察してください。
