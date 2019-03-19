@@ -2,6 +2,7 @@ const {Client, RichEmbed} = require('discord.js');
 const client = new Client();
 const fs = require("fs");
 const request = require('request');
+const crypto = require("crypto");
 
 client.on('message', async msg => {
     const memberId = msg.author.id;
@@ -25,7 +26,10 @@ client.on('message', async msg => {
                     if(typeof twitcas[userId] === 'undefined'){
                         twitcas[userId] = {name : '', token : ''};
                     }
-                    twitcas[userId].token = token;
+                    var cipher   = crypto.createCipher(ALGORITHM, KEY );
+                    var ciphered = cipher.update(token, INPUT_ENCODING, OUTPUT_ENCODING);
+                    ciphered    += cipher.final(OUTPUT_ENCODING);
+                    twitcas[userId].token = ciphered;
                     twitcas[userId].name = body.user.name;
                     var charset = 'utf-8';
                     var place = './api/twitcas/token.json';
@@ -46,7 +50,7 @@ client.on('message', async msg => {
         return;
     }
     
-    if(msg.channel.id === '554665961630990336'){
+    if(msg.channel.id === '000000000000000000'){
         if(msg.content === '!login'){
             msg.author.send("<https://example.com/login>\nにアクセスして認証し、表示されたコードをここにコピペしてね。");
         }
@@ -58,13 +62,16 @@ client.on('message', async msg => {
                 return;
             }else{
                 var token = twitcas[msg.author.id].token;
+                var decipher   = crypto.createDecipher(ALGORITHM, KEY);
+                var deciphered = decipher.update(token, OUTPUT_ENCODING, INPUT_ENCODING );
+                deciphered    += decipher.final(INPUT_ENCODING);
             }
             var options = {
                 url: 'https://apiv2.twitcasting.tv/verify_credentials',
                 headers: {
                     'Accept':'application/json',
                     'X-Api-Version':'2.0',
-                    'Authorization':'Bearer ' + token,
+                    'Authorization':'Bearer ' + deciphered,
                 },
                 json: true
             };
@@ -92,13 +99,16 @@ client.on('message', async msg => {
                 return;
             }else{
                 var token = twitcas[userId].token;
+                var decipher   = crypto.createDecipher(ALGORITHM, KEY);
+                var deciphered = decipher.update(token, OUTPUT_ENCODING, INPUT_ENCODING );
+                deciphered    += decipher.final(INPUT_ENCODING);
             }
             var options = {
                 uri: "https://apiv2.twitcasting.tv/users/yasalabo/current_live",
                 headers: {
                     'Accept':'application/json',
                     'X-Api-Version':'2.0',
-                    'Authorization':'Bearer ' + token,
+                    'Authorization':'Bearer ' + deciphered,
                 },
                 json: true
             };
@@ -152,6 +162,9 @@ client.on('message', async msg => {
             return;
         }
         var token = twitcas[userId].token;
+        var decipher   = crypto.createDecipher(ALGORITHM, KEY);
+        var deciphered = decipher.update(token, OUTPUT_ENCODING, INPUT_ENCODING );
+        deciphered    += decipher.final(INPUT_ENCODING);
         var movieID = movieid[todays].id;
         var options = {
             url: 'https://apiv2.twitcasting.tv/movies/' + movieID + '/comments',
@@ -159,7 +172,7 @@ client.on('message', async msg => {
                 'Accept':'application/json',
                 'X-Api-Version':'2.0',
                 'Content-Type':'application/json',
-                'Authorization':'Bearer ' + token,
+                'Authorization':'Bearer ' + deciphered,
             },
             body: {
                 "comment": msg.content,
